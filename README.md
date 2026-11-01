@@ -1,4 +1,4 @@
-# PVA--GLU network LAMMPS validation
+# PVA--GLU network validation
 
 Post-anisocompression atomistic configurations for dry, idealized PVA--GLU
 networks with prescribed tetrafunctional junction connectivity. These are
@@ -65,6 +65,36 @@ The source workspace contained a successful saved validation output for
 configurations have already passed a new LAMMPS execution check. Compression,
 hash integrity, and required coefficient-section checks were performed for
 all distributed files.
+
+## GROMACS configurations
+
+The `gromacs/configurations/` folders contain the nine post-GROMACS-
+anisocompression configurations, one for each strand length and replica. Each
+folder includes a compressed coordinate file (`anisocompression_gromacs.gro.gz`),
+the system topology (`topol_gromacs.top`), its force-field include
+(`forcefield_gromacs.itp`), and the network-specific topology include
+(`hydrogel_network_gromacs.itp.gz`). These are GROMACS starting configurations
+before the 21-stage temperature/pressure equilibration, not production
+endpoints. The large coordinate and network-topology files are gzip-compressed
+to keep individual repository files below common hosting limits.
+
+To preprocess a representative first equilibration stage, decompress the two
+compressed files in one replica directory and run `grompp` from that directory:
+
+```bash
+cd gromacs/configurations/n17/replica1
+gunzip -k anisocompression_gromacs.gro.gz hydrogel_network_gromacs.itp.gz
+gmx grompp -f ../../../examples/eq_step_01_sample.mdp \
+  -c anisocompression_gromacs.gro \
+  -p topol_gromacs.top \
+  -o sample_eq_step_01.tpr
+```
+
+`gromacs/examples/eq_step_01_sample.mdp` is the saved first-step input from
+the `n=17`, replica 1 workflow. It is provided as a representative example,
+not as a replacement for the complete 21-stage protocol; later stages use
+their own state-dependent settings and starting checkpoints. GROMACS run
+input (`.tpr`) files, trajectories, and simulation logs are not distributed.
 
 ## Visualizing crosslinks in VMD / TopoTools
 
